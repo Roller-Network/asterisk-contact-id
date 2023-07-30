@@ -1,6 +1,6 @@
---
+-- 
 -- Table structure for table `alarmreceiver`
---
+-- 
 
 DROP TABLE IF EXISTS `alarmreceiver`;
 CREATE TABLE `alarmreceiver` (
@@ -16,9 +16,9 @@ CREATE TABLE `alarmreceiver` (
     KEY `callingfrom` (`callingfrom`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---
+-- 
 -- Table structure for table `alarmreceiver_test`
---
+-- 
 
 DROP TABLE IF EXISTS `alarmreceiver_test`;
 
