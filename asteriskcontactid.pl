@@ -74,7 +74,7 @@ my %events = (
         122 => "Silent",
         123 => "Audible",
         124 => "Duress - Access Granted",
-        125 => "Diress - Egress Granted",
+        125 => "Duress - Egress Granted",
 
         # 130 - Burglar Alarms
         130 => "Burglary",
