@@ -427,11 +427,11 @@ sub processEvents {
         
         elsif ($events) {
             # Translate DTMF into Contact ID values
-            s/B/E/;  # DTMF B is Contact ID E
-            s/C/F/;  # DTMF C is Contact ID F
-            s/\*/B/; # DTMF * is Contact ID B
-            s/#/C/;  # DTMF # is Contact ID C
-            s/A/D/;  # DTMF A is Contact ID D
+            s/B/E/g;  # DTMF B is Contact ID E
+            s/C/F/g;  # DTMF C is Contact ID F
+            s/\*/B/g; # DTMF * is Contact ID B
+            s/#/C/g;  # DTMF # is Contact ID C
+            s/A/D/g;  # DTMF A is Contact ID D
 
             # Contact ID event format
             # ACCT MT QXYZ GG CCC S
