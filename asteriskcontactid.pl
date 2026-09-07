@@ -12,6 +12,7 @@
 #
 
 use strict;
+use warnings;
 use IO::Dir;
 use DBI;
 use DateTime::Format::Strptime;
@@ -20,7 +21,7 @@ use MIME::Lite;
 
 my $spoolDir = '/var/spool/asterisk/alarmreceiver';
 my $dbi = "DBI:mysql:host=localhost;database=asterisk";
-my $dbuIser = "asterisk";
+my $dbiUser = "asterisk";
 my $dbiPassword = "";
 
 my $emailFrom = 'alarmreceiver@example.com';
@@ -73,7 +74,7 @@ my %events = (
         122 => "Silent",
         123 => "Audible",
         124 => "Duress - Access Granted",
-        125 => "Diress - Egress Granted",
+        125 => "Duress - Egress Granted",
 
         # 130 - Burglar Alarms
         130 => "Burglary",
@@ -426,11 +427,11 @@ sub processEvents {
         
         elsif ($events) {
             # Translate DTMF into Contact ID values
-            s/B/E/;  # DTMF B is Contact ID E
-            s/C/F/;  # DTMF C is Contact ID F
-            s/\*/B/; # DTMF * is Contact ID B
-            s/#/C/;  # DTMF # is Contact ID C
-            s/A/D/;  # DTMF A is Contact ID D
+            s/B/E/g;  # DTMF B is Contact ID E
+            s/C/F/g;  # DTMF C is Contact ID F
+            s/\*/B/g; # DTMF * is Contact ID B
+            s/#/C/g;  # DTMF # is Contact ID C
+            s/A/D/g;  # DTMF A is Contact ID D
 
             # Contact ID event format
             # ACCT MT QXYZ GG CCC S
@@ -448,7 +449,7 @@ sub processEvents {
             if ($_ =~ /^([0-9B-F]{4})(18|98)(1|3|6)([0-9B-F]{3})([0-9B-F]{2})([0-9B-F]{3})([0-9B-F]{1})$/) {
 
                 # skip if checksum failed
-                if (!checksum($7)) {
+                if (!checksum($_)) {
                     print "Skipping event $_: checksum failed!\n";
                     next;
                 }
@@ -500,7 +501,7 @@ sub notifyEvent {
     my $zone = shift;
 
     # don't notify for these events
-    return if ($event == '602'); # routine test
+    return if ($event eq '602'); # routine test
 
     # start with undefined message
     my $notifyString = undef;
@@ -519,21 +520,21 @@ sub notifyEvent {
 
     # 300 Series - Troubles
     if ($event =~ /3[0-9]{2}/) {
-        if ($event == '350') {
+        if ($event eq '350') {
             #350 => "Communication Trouble"
             $notifyString = sprintf("%s %s Line %s (%s)",
                     $accts{$account}, $events{$event}, $zone, $eventQualAlarm{$qual});
         }
-        elsif ($event == '354') {
+        elsif ($event eq '354') {
             #354 => "Failure To Communicate Event"
             $notifyString = sprintf("%s %s Account %s (%s)",
                     $accts{$account}, $events{$event}, $zone, $eventQualAlarm{$qual});
         }
-        elsif ($zone != 000) {
+        elsif ($zone ne '000') {
             $notifyString = sprintf("%s\nAlarm: %s \nZone: %s (%s)",
                     $accts{$account}, $events{$event}, $zone, $eventQualAlarm{$qual});
         }
-        elsif ($group != 00) {
+        elsif ($group ne '00') {
             $notifyString = sprintf("%s\nAlarm: %s \nModule: %s (%s)",
                     $accts{$account}, $events{$event}, $group, $eventQualAlarm{$qual});
         }
@@ -554,7 +555,7 @@ sub notifyEvent {
 
     # 601 Manual Trigger Test Report
     # 608 Periodic Test - System Trouble Present
-    if ($event == '608' || $event == '601') {
+    if ($event eq '608' || $event eq '601') {
         $notifyString = sprintf("%s\n%s", $accts{$account}, $events{$event});
     }
 
@@ -622,7 +623,7 @@ sub storeEvent {
 
     # 601 Manual Trigger Test Report
     # 602 Periodic Test Report
-    if ($cidevent == '602' || $cidevent == '601') {
+    if ($cidevent eq '602' || $cidevent eq '601') {
         $dbh->do(q{
                 UPDATE alarmreceiver_test
                 SET timestamp = ?
@@ -637,9 +638,10 @@ sub storeEvent {
 # Contact ID Checksum
 sub checksum {
     # (Sum of all message digits + S) MOD 15 = 0
+    my $data = shift;
 
     my $sum = 0;
-    foreach my $c (split //) {
+    foreach my $c (split //, $data) {
         $sum += $map{$c};
     }
     
