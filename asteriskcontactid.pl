@@ -12,6 +12,7 @@
 #
 
 use strict;
+use warnings;
 use IO::Dir;
 use DBI;
 use DateTime::Format::Strptime;
