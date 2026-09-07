@@ -501,7 +501,7 @@ sub notifyEvent {
     my $zone = shift;
 
     # don't notify for these events
-    return if ($event == '602'); # routine test
+    return if ($event eq '602'); # routine test
 
     # start with undefined message
     my $notifyString = undef;
@@ -520,21 +520,21 @@ sub notifyEvent {
 
     # 300 Series - Troubles
     if ($event =~ /3[0-9]{2}/) {
-        if ($event == '350') {
+        if ($event eq '350') {
             #350 => "Communication Trouble"
             $notifyString = sprintf("%s %s Line %s (%s)",
                     $accts{$account}, $events{$event}, $zone, $eventQualAlarm{$qual});
         }
-        elsif ($event == '354') {
+        elsif ($event eq '354') {
             #354 => "Failure To Communicate Event"
             $notifyString = sprintf("%s %s Account %s (%s)",
                     $accts{$account}, $events{$event}, $zone, $eventQualAlarm{$qual});
         }
-        elsif ($zone != 000) {
+        elsif ($zone ne '000') {
             $notifyString = sprintf("%s\nAlarm: %s \nZone: %s (%s)",
                     $accts{$account}, $events{$event}, $zone, $eventQualAlarm{$qual});
         }
-        elsif ($group != 00) {
+        elsif ($group ne '00') {
             $notifyString = sprintf("%s\nAlarm: %s \nModule: %s (%s)",
                     $accts{$account}, $events{$event}, $group, $eventQualAlarm{$qual});
         }
@@ -555,7 +555,7 @@ sub notifyEvent {
 
     # 601 Manual Trigger Test Report
     # 608 Periodic Test - System Trouble Present
-    if ($event == '608' || $event == '601') {
+    if ($event eq '608' || $event eq '601') {
         $notifyString = sprintf("%s\n%s", $accts{$account}, $events{$event});
     }
 
@@ -623,7 +623,7 @@ sub storeEvent {
 
     # 601 Manual Trigger Test Report
     # 602 Periodic Test Report
-    if ($cidevent == '602' || $cidevent == '601') {
+    if ($cidevent eq '602' || $cidevent eq '601') {
         $dbh->do(q{
                 UPDATE alarmreceiver_test
                 SET timestamp = ?
