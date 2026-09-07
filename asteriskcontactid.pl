@@ -449,7 +449,7 @@ sub processEvents {
             if ($_ =~ /^([0-9B-F]{4})(18|98)(1|3|6)([0-9B-F]{3})([0-9B-F]{2})([0-9B-F]{3})([0-9B-F]{1})$/) {
 
                 # skip if checksum failed
-                if (!checksum($7)) {
+                if (!checksum($_)) {
                     print "Skipping event $_: checksum failed!\n";
                     next;
                 }
@@ -638,9 +638,10 @@ sub storeEvent {
 # Contact ID Checksum
 sub checksum {
     # (Sum of all message digits + S) MOD 15 = 0
+    my $data = shift;
 
     my $sum = 0;
-    foreach my $c (split //) {
+    foreach my $c (split //, $data) {
         $sum += $map{$c};
     }
     
