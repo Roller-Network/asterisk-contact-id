@@ -21,7 +21,7 @@ use MIME::Lite;
 
 my $spoolDir = '/var/spool/asterisk/alarmreceiver';
 my $dbi = "DBI:mysql:host=localhost;database=asterisk";
-my $dbuIser = "asterisk";
+my $dbiUser = "asterisk";
 my $dbiPassword = "";
 
 my $emailFrom = 'alarmreceiver@example.com';
